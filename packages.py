@@ -4,3 +4,5 @@ import matplotlib
 import requests
 import mock
 import unittest
+import parameterized
+import itertools
