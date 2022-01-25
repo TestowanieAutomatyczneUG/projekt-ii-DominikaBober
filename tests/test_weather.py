@@ -13,7 +13,7 @@ data_meteo["datetime"] = pd.to_datetime(data_meteo["datetime"])
 
 class Test_Weather(unittest.TestCase):
 
-    testing = "test_localizations"
+    testing = "all"
 
     @requests_mock.Mocker()
     def setUp(self, mock_request):
@@ -155,7 +155,6 @@ class Test_Weather(unittest.TestCase):
         ('33030983', ),
         ('20803878', )
     ])
-    @requests_mock.Mocker()
     @mock.patch.object(Weather, 'save_weather', mock.MagicMock(return_value="OK"))
     @unittest.skipIf(testing != "test_save_weather" and testing != "all", "TDD")
     def test_save_weather(self, localization):
@@ -166,13 +165,23 @@ class Test_Weather(unittest.TestCase):
                 (localization), 
         list(data_meteo.columns)[1:]))
     )
-    @requests_mock.Mocker()
-    @mock.patch.object(Weather, 'delete_weather', mock.MagicMock(return_value="OK"))
+    @mock.patch.object(Weather, 'update_weather', mock.MagicMock(return_value="OK"))
     @unittest.skipIf(testing != "test_update_weather" and testing != "all", "TDD")
     def test_update_weather(self, localization):
         temp = data_meteo[["datetime", localization]]
         temp.columns = ["datetime", "value"]
         self.assertTrue(self.serwer.update_weather(localization, temp) == 'OK')
+    
+    @parameterized.parameterized.expand([
+        ('24370401', ),
+        ('10831039', ),
+        ('33030983', ),
+        ('20803878', )
+    ])
+    @unittest.skipIf(testing != "test_update_weather" and testing != "all", "TDD")
+    def test_update_weather_exception(self, localization):
+        hamcrest.assert_that(hamcrest.calling(self.serwer.update_weather)
+        .with_args(localization, pd.DataFrame(columns=["datetime", "value"])), hamcrest.raises(Exception))
     
     @parameterized.parameterized.expand(
         list(map(lambda localization:
@@ -183,6 +192,17 @@ class Test_Weather(unittest.TestCase):
     @unittest.skipIf(testing != "test_localizations" and testing != "all", "TDD")
     def test_delete_weather(self, localization):
         self.assertTrue(self.serwer.delete_weather(localization) == 'OK')
+    
+    @parameterized.parameterized.expand([
+        ('24370401', ),
+        ('10831039', ),
+        ('33030983', ),
+        ('20803878', )
+    ])
+    @unittest.skipIf(testing != "test_delete_weather" and testing != "all", "TDD")
+    def test_delete_weather_exception(self, localization):
+        hamcrest.assert_that(hamcrest.calling(self.serwer.delete_weather)
+        .with_args(localization), hamcrest.raises(Exception))
 
     @parameterized.parameterized.expand([
         ('24370401', ),
