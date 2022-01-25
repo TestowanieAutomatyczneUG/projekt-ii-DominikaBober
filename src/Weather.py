@@ -6,16 +6,11 @@ class Weather:
 
     def __init__(self, host):
         self.host = host
-        self.localizations = []
-    
-    def set_localizations(self, localizations):
-        self.localizations = localizations
-
-    def get_localizations(self):
-        return self.localizations
+        localizations_response: requests.Response = requests.get(f'{host}/localizations').json()
+        self.localizations = localizations_response['localizations']
 
     def get_data(self, localization):
-        if type(localization) is str and localization in self.get_localizations():
+        if localization in self.localizations:
             pass
         else:
             raise Exception("Localization not available")
@@ -30,17 +25,29 @@ class Weather:
         return pd.DataFrame({"datetime": forecast_time[1:]})
 
     def weather_static(self, localization):
-        if type(localization) is str and localization in self.get_localizations():
+        if localization in self.localizations:
             data = self.get_data(localization)
             return data.describe()
         else:
             raise Exception("Localization not available")
 
-    def safe_weather(self, localization, input_data):
-        pass
+    def save_weather(self, localization, input_data):
+        post_data = input_data.copy()
+        post_data.loc[:, 'datetime'] = post_data['datetime'].astype(str)
+        post_data = {'payload': post_data.to_dict(orient='list')}
+        return requests.post(f'{self.host}/save/{localization}', json=post_data).text
 
     def update_weather(self, localization, update_data):
-        pass
+        if localization in self.localizations:
+            post_data = update_data.copy()
+            post_data.loc[:, 'datetime'] = post_data['datetime'].astype(str)
+            post_data = {'payload': post_data.to_dict(orient='list')}
+            return requests.put(f'{self.host}/save/{localization}', json=post_data).text
+        else:
+            raise Exception("Localization not available")
 
     def delete_weather(self, localization):
-        pass
+        if localization in self.localizations:
+            return requests.delete(f'{self.host}/{localization}').text
+        else:
+            raise Exception("Localization not available")
