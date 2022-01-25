@@ -94,11 +94,13 @@ class Test_Weather(unittest.TestCase):
     )
     @unittest.skipIf(testing != "test_weather_static" and testing != "all", "TDD")
     def test_weather_static_length(self, localization):
-        temp = data_meteo[["datetime", localization]]
-        temp.columns = ["datetime", "value"]
-        self.serwer.get_data = mock.Mock(name = "get_data")
-        self.serwer.get_data.return_value = temp
-        self.assertTrue(len(self.serwer.weather_static(localization).index) == 8)
+        with unittest.mock.patch("matplotlib.pyplot.show") as mock_plt_show:
+            mock_plt_show.return_value = None
+            temp = data_meteo[["datetime", localization]]
+            temp.columns = ["datetime", "value"]
+            self.serwer.get_data = mock.Mock(name = "get_data")
+            self.serwer.get_data.return_value = temp
+            self.assertTrue(len(self.serwer.weather_static(localization).index) == 8)
 
     @parameterized.parameterized.expand(
         list(map(lambda localization:
@@ -107,11 +109,13 @@ class Test_Weather(unittest.TestCase):
     )
     @unittest.skipIf(testing != "test_weather_static" and testing != "all", "TDD")
     def test_weather_static_values(self, localization):
-        temp = data_meteo[["datetime", localization]]
-        temp.columns = ["datetime", "value"]
-        self.serwer.get_data = mock.Mock(name = "get_data")
-        self.serwer.get_data.return_value = temp
-        hamcrest.assert_that([self.serwer.weather_static(localization)['value'], temp.describe()['value']], hamcrest.is_(is_good_Describtion_values()))
+        with unittest.mock.patch("matplotlib.pyplot.show") as mock_plt_show:
+            mock_plt_show.return_value = None
+            temp = data_meteo[["datetime", localization]]
+            temp.columns = ["datetime", "value"]
+            self.serwer.get_data = mock.Mock(name = "get_data")
+            self.serwer.get_data.return_value = temp
+            hamcrest.assert_that([self.serwer.weather_static(localization)['value'], temp.describe()['value']], hamcrest.is_(is_good_Describtion_values()))
     
     @parameterized.parameterized.expand(
         list(map(lambda localization:
@@ -120,11 +124,13 @@ class Test_Weather(unittest.TestCase):
     )
     @unittest.skipIf(testing != "test_weather_static" and testing != "all", "TDD")
     def test_weather_static_keys(self, localization):
-        temp = data_meteo[["datetime", localization]]
-        temp.columns = ["datetime", "value"]
-        self.serwer.get_data = mock.Mock(name = "get_data")
-        self.serwer.get_data.return_value = temp
-        assertpy.assert_that(self.serwer.weather_static(localization).index).is_good_Describtion_keys()
+        with unittest.mock.patch("matplotlib.pyplot.show") as mock_plt_show:
+            mock_plt_show.return_value = None
+            temp = data_meteo[["datetime", localization]]
+            temp.columns = ["datetime", "value"]
+            self.serwer.get_data = mock.Mock(name = "get_data")
+            self.serwer.get_data.return_value = temp
+            assertpy.assert_that(self.serwer.weather_static(localization).index).is_good_Describtion_keys()
     
     @parameterized.parameterized.expand(
         list(map(lambda localization:
@@ -133,11 +139,13 @@ class Test_Weather(unittest.TestCase):
     )
     @unittest.skipIf(testing != "test_weather_static" and testing != "all", "TDD")
     def test_weather_static_localizations(self, localization):
-        temp = data_meteo[["datetime", localization]]
-        temp.columns = ["datetime", "value"]
-        self.serwer.get_data = mock.Mock(name = "get_data")
-        self.serwer.get_data.return_value = temp
-        self.serwer.weather_static(localization)
+        with unittest.mock.patch("matplotlib.pyplot.show") as mock_plt_show:
+            mock_plt_show.return_value = None
+            temp = data_meteo[["datetime", localization]]
+            temp.columns = ["datetime", "value"]
+            self.serwer.get_data = mock.Mock(name = "get_data")
+            self.serwer.get_data.return_value = temp
+            self.serwer.weather_static(localization)
 
     @parameterized.parameterized.expand([
         ('', ),

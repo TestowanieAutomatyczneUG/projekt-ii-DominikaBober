@@ -29,6 +29,9 @@ class Weather:
     def weather_static(self, localization):
         if localization in self.localizations:
             data = self.get_data(localization)
+            plt.hist(data['value'], bins=20)
+            plt.title(f"{localization} statistic")
+            plt.show()
             return data.describe()
         else:
             raise Exception("Localization not available")
