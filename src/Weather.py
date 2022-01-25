@@ -29,11 +29,12 @@ class Weather:
         forecast_time = pd.date_range(list(data['datetime'])[-1].date(), periods=number_of_days+1, freq="D")
         return pd.DataFrame({"datetime": forecast_time[1:]})
 
-    def predict_weather(self, localization):
-        pass
-
     def weather_static(self, localization):
-        pass
+        if type(localization) is str and localization in self.get_localizations():
+            data = self.get_data(localization)
+            return data.describe()
+        else:
+            raise Exception("Localization not available")
 
     def safe_weather(self, localization, input_data):
         pass
