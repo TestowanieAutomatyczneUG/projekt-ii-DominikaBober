@@ -6,12 +6,14 @@ class Weather:
 
     def __init__(self, host):
         self.host = host
-        localizations_response: requests.Response = requests.get(f'{host}/localizations').json()
+        localizations_response: requests.Response = requests.get(f'{self.host}/localizations').json()
         self.localizations = localizations_response['localizations']
 
     def get_data(self, localization):
         if localization in self.localizations:
-            pass
+            get_data_response: requests.Response = requests.get(f'{self.host}/data/{localization}').json()
+            data = pd.DataFrame.from_dict(get_data_response['data'])
+            return data
         else:
             raise Exception("Localization not available")
 
@@ -35,19 +37,26 @@ class Weather:
         post_data = input_data.copy()
         post_data.loc[:, 'datetime'] = post_data['datetime'].astype(str)
         post_data = {'payload': post_data.to_dict(orient='list')}
-        return requests.post(f'{self.host}/save/{localization}', json=post_data).text
+        save_response: requests.Response = requests.post(f'{self.host}/save/{localization}', json=post_data)
+        localizations_response: requests.Response = requests.get(f'{self.host}/localizations').json()
+        self.localizations = localizations_response['localizations']
+        return save_response.text
 
     def update_weather(self, localization, update_data):
         if localization in self.localizations:
             post_data = update_data.copy()
             post_data.loc[:, 'datetime'] = post_data['datetime'].astype(str)
             post_data = {'payload': post_data.to_dict(orient='list')}
-            return requests.put(f'{self.host}/save/{localization}', json=post_data).text
+            update_response: requests.Response = requests.put(f'{self.host}/save/{localization}', json=post_data)
+            return update_response.text
         else:
             raise Exception("Localization not available")
 
     def delete_weather(self, localization):
         if localization in self.localizations:
-            return requests.delete(f'{self.host}/{localization}').text
+            delete_response: requests.Response = requests.delete(f'{self.host}/{localization}')
+            localizations_response: requests.Response = requests.get(f'{self.host}/localizations').json()
+            self.localizations = localizations_response['localizations']
+            return delete_response.text
         else:
             raise Exception("Localization not available")
