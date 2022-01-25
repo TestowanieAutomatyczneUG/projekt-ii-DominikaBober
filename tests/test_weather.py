@@ -13,7 +13,7 @@ data_meteo["datetime"] = pd.to_datetime(data_meteo["datetime"])
 
 class Test_Weather(unittest.TestCase):
 
-    testing = "test_get_data"
+    testing = "test_get_weather"
 
     def setUp(self):
         self.serwer = Weather(host)

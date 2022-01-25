@@ -21,7 +21,8 @@ class Weather:
             raise Exception("Localization not available")
 
     def get_weather(self, localization, time):
-        pass
+        data = self.get_data(localization)
+        return data[data["datetime"]==pd.to_datetime(time)]
 
     def get_weather_forecast(self, localization):
         pass
