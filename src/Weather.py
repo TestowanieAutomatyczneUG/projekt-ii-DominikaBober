@@ -24,8 +24,10 @@ class Weather:
         data = self.get_data(localization)
         return data[data["datetime"]==pd.to_datetime(time)]
 
-    def get_weather_forecast(self, localization):
-        pass
+    def get_weather_forecast(self, localization, number_of_days):
+        data = self.get_data(localization)
+        forecast_time = pd.date_range(list(data['datetime'])[-1].date(), periods=number_of_days+1, freq="D")
+        return pd.DataFrame({"datetime": forecast_time[1:]})
 
     def predict_weather(self, localization):
         pass
