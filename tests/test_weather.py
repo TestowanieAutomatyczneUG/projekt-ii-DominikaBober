@@ -13,7 +13,7 @@ data_meteo["datetime"] = pd.to_datetime(data_meteo["datetime"])
 
 class Test_Weather(unittest.TestCase):
 
-    testing = "all"
+    testing = "test_get_weather"
 
     @requests_mock.Mocker()
     def setUp(self, mock_request):
@@ -47,18 +47,19 @@ class Test_Weather(unittest.TestCase):
 
     @parameterized.parameterized.expand(
         list(itertools.chain.from_iterable(
-            list(map(lambda localization: list(map(lambda time, value: 
-                (localization, time, value),
-            data_meteo[::6*24]["datetime"], data_meteo[::6*24][localization])),
+            list(map(lambda localization: list(map(lambda time: 
+                (localization, time),
+            data_meteo[::6*24]["datetime"])),
         list(data_meteo.columns)[1:]))))
     )
     @unittest.skipIf(testing != "test_get_weather" and testing != "all", "TDD")
-    def test_get_weather(self, localization, time, value):
+    def test_get_weather(self, localization, time):
         temp = data_meteo[["datetime", localization]]
         temp.columns = ["datetime", "value"]
         self.serwer.get_data = mock.Mock(name = "get_data")
         self.serwer.get_data.return_value = temp
-        self.assertTrue(value == self.serwer.get_weather(localization, time).values[0][1])
+        value = list(temp[temp["datetime"]<=pd.to_datetime(time)]['value'])[-1]
+        assertpy.assert_that(self.serwer.get_weather(localization, time)).is_close_to(value, 0.1)
 
     @parameterized.parameterized.expand(
         list(itertools.chain.from_iterable(

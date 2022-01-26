@@ -19,7 +19,10 @@ class Weather:
 
     def get_weather(self, localization, time):
         data = self.get_data(localization)
-        return data[data["datetime"]==pd.to_datetime(time)]
+        if len(data[data["datetime"]<=pd.to_datetime(time)])>0:
+            return list(data[data["datetime"]<=pd.to_datetime(time)]['value'])[-1]
+        else:
+            raise Exception("Time not aviable")
 
     def get_weather_forecast(self, localization, number_of_days):
         data = self.get_data(localization)
@@ -28,14 +31,11 @@ class Weather:
         return pd.DataFrame({"datetime": forecast_time[1:], "value": forecast_value})
 
     def weather_static(self, localization):
-        if localization in self.localizations:
-            data = self.get_data(localization)
-            plt.hist(data['value'], bins=20)
-            plt.title(f"{localization} statistic")
-            plt.show()
-            return data.describe()
-        else:
-            raise Exception("Localization not available")
+        data = self.get_data(localization)
+        plt.hist(data['value'], bins=20)
+        plt.title(f"{localization} statistic")
+        plt.show()
+        return data.describe()
 
     def save_weather(self, localization, input_data):
         post_data = input_data.copy()
