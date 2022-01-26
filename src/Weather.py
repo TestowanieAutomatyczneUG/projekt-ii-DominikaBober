@@ -24,7 +24,8 @@ class Weather:
     def get_weather_forecast(self, localization, number_of_days):
         data = self.get_data(localization)
         forecast_time = pd.date_range(list(data['datetime'])[-1].date(), periods=number_of_days+1, freq="D")
-        return pd.DataFrame({"datetime": forecast_time[1:]})
+        forecast_value = list(list(data['value'])[-1]+(i/number_of_days)*np.mean([list(data['value'])[-1],list(data['value'])[-2]]) for i in range(number_of_days) )
+        return pd.DataFrame({"datetime": forecast_time[1:], "value": forecast_value})
 
     def weather_static(self, localization):
         if localization in self.localizations:

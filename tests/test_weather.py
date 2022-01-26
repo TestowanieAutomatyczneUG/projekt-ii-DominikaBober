@@ -72,7 +72,7 @@ class Test_Weather(unittest.TestCase):
         temp.columns = ["datetime", "value"]
         self.serwer.get_data = mock.Mock(name = "get_data")
         self.serwer.get_data.return_value = temp
-        self.assertTrue(days == len(self.serwer.get_weather_forecast(localization, days)))
+        self.assertTrue(days == len(self.serwer.get_weather_forecast(localization, days)["value"]))
     
     @parameterized.parameterized.expand(
         list(map(lambda localization:
@@ -86,6 +86,19 @@ class Test_Weather(unittest.TestCase):
         self.serwer.get_data = mock.Mock(name = "get_data")
         self.serwer.get_data.return_value = temp
         self.assertTrue(list(temp['datetime'])[-1].date() + datetime.timedelta(days=1) == list(self.serwer.get_weather_forecast(localization, days)['datetime'])[0].date())
+
+    @parameterized.parameterized.expand(
+        list(map(lambda localization:
+                (localization, 1), 
+        list(data_meteo.columns)[1:]))
+    )
+    @unittest.skipIf(testing != "test_get_weather_forecast" and testing != "all", "TDD")
+    def test_get_weather_forecast_keys(self, localization, days):
+        temp = data_meteo[["datetime", localization]]
+        temp.columns = ["datetime", "value"]
+        self.serwer.get_data = mock.Mock(name = "get_data")
+        self.serwer.get_data.return_value = temp
+        self.assertTrue(list(self.serwer.get_weather_forecast(localization, days).keys()) == ["datetime", "value"])
 
     @parameterized.parameterized.expand(
         list(map(lambda localization:
